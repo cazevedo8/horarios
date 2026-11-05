@@ -57,11 +57,10 @@
   button.danger:hover:not(:disabled) { background: var(--danger-dark); border-color: var(--danger-dark); color: #fff; }
   button.small { padding: 0.3rem 0.55rem; font-size: 0.78rem; border-radius: 6px; }
   button:disabled { opacity: .5; cursor: not-allowed; }
-  .btn-block { width: 100%; padding: 0.65rem 1rem; font-size: 0.9rem; margin-top: 1px; }
+  .btn-block { width: 100%; padding: 0.65rem 1rem; font-size: 0.9rem; margin-top: 5px; }
   .btn-big { padding: 0.8rem 1rem; font-size: 1rem; }
-  /* Todos os botões "adicionar" recuam 1px para baixo */
-  .panel > .btn-block, .disp-builder > .btn-block, button[onclick*="adicionar"], button[onclick*="Adicionar"] { margin-top: 1px; }
-  select[multiple] { min-height: 88px; font-size: 0.85rem; }
+  /* Todos os botões "adicionar" recuam 5px para baixo */
+  .panel > .btn-block, .disp-builder > .btn-block, button[onclick*="adicionar"], button[onclick*="Adicionar"] { margin-top: 5px; }
 
   /* ===== Nav / Abas ===== */
   nav { background: var(--card); border-bottom: 1px solid var(--border); padding: 0.5rem 1.5rem; display: flex; gap: 0.25rem; overflow-x: auto; position: sticky; top: var(--header-h); z-index: 30; scrollbar-width: none; }
@@ -191,7 +190,8 @@
     <button class="active" onclick="mostrarAba('cadastros')">Cadastros</button>
     <button onclick="mostrarAba('geracao')">Geração</button>
     <button onclick="mostrarAba('quadro')">Quadro Geral</button>
-    <button onclick="mostrarAba('regras')">Regras</button>
+    <!-- Aba Regras oculta para uso posterior (mantida no arquivo) -->
+    <button class="oculto" hidden onclick="mostrarAba('regras')">Regras</button>
   </div>
 </nav>
 
@@ -250,17 +250,7 @@
         <div><label>Disciplina</label><select id="inp-prof-disc"><option value="">— selecionar —</option></select></div>
       </div>
       <div class="linha">
-        <div style="min-width:100%"><label>Séries que pode lecionar (múltiplas — segure Ctrl / Cmd)</label>
-          <select id="inp-prof-series" multiple size="5">
-            <option value="6º ano">6º ano</option>
-            <option value="7º ano">7º ano</option>
-            <option value="8º ano">8º ano</option>
-            <option value="9º ano">9º ano</option>
-            <option value="1ª serie">1ª série</option>
-            <option value="2ª serie">2ª série</option>
-            <option value="3ª serie">3ª série</option>
-          </select>
-        </div>
+        <div><label>Série que pode lecionar</label><select id="inp-prof-series"><option value="">— selecionar —</option><option value="6º ano">6º ano</option><option value="7º ano">7º ano</option><option value="8º ano">8º ano</option><option value="9º ano">9º ano</option><option value="1ª serie">1ª serie</option><option value="2ª serie">2ª serie</option><option value="3ª serie">3ª serie</option></select></div>
         <div><label>Carga máx. por semana (aulas)</label><input type="number" id="inp-prof-carga" value="20" min="1"></div>
       </div>
       <div class="linha">
@@ -343,8 +333,8 @@
   </section>
   <!-- FIM ABA: QUADRO -->
 
-  <!-- ABA: REGRAS -->
-  <section id="aba-regras">
+  <!-- ABA: REGRAS (oculta — mantida no arquivo para uso posterior) -->
+  <section id="aba-regras" class="oculto" hidden>
     <h2 style="margin-top:0; font-size:1rem; color:#111827; font-weight:700;">📜 Regras de Formatação (Minuta 1337/2023)</h2>
     <p class="msg">Regras oficiais para construção do mapa/horário do campus Realengo II (2027).</p>
     <div id="regras-conteudo"></div>
@@ -808,7 +798,8 @@
   function adicionarProfessor() {
     const nome = $id('inp-prof-nome').value.trim();
     const disc = $id('inp-prof-disc').value;
-    const series = [...$id('inp-prof-series').selectedOptions].map(o => o.value);
+    const serieSel = $id('inp-prof-series').value;
+    const series = serieSel ? [serieSel] : [];
     const carga = +$id('inp-prof-carga').value || 0;
     const disponibilidade = dispTemp.length ? dispTemp.map(d => ({ dia: d.dia, turnos: d.turnos.slice() })) : [];
     const dias = disponibilidade.map(d => d.dia);
@@ -816,9 +807,9 @@
     const sabVol = $id('inp-prof-sab-voluntario') ? $id('inp-prof-sab-voluntario').checked : false;
     if (!nome || !disc) { alert('Informe nome e disciplina.'); return; }
     if (disponibilidade.length === 0) { alert('Adicione ao menos uma disponibilidade (dia + turno).'); return; }
-    if (series.length === 0) { alert('Selecione ao menos uma série que pode lecionar.'); return; }
+    if (series.length === 0) { alert('Selecione a série que pode lecionar.'); return; }
     // Alerta (sem bloqueio) padrão mínimo 40h: 3 dias / 2 séries
-    if (carga >= 20 && (dias.length < 3 || series.length < 2)) {
+    if (carga >= 20 && dias.length < 3) {
       alert('Aviso: professores 40h (≥20 tempos) devem indicar no mínimo 3 dias e 2 séries (Minuta 1337/2023). Cadastro mantido.');
     }
     if (carga >= 20 && turnos.length < 2) {
@@ -836,7 +827,7 @@
     });
     $id('inp-prof-nome').value = '';
     $id('inp-prof-disc').value = '';
-    [...$id('inp-prof-series').options].forEach(o => { o.selected = false; });
+    $id('inp-prof-series').value = '';
     if ($id('inp-prof-sab-voluntario')) $id('inp-prof-sab-voluntario').checked = false;
     limparDispTemp();
     salvarEstado();
