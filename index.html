@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Montador de Horários Escolares</title>
+<link rel="icon" type="image/png" href="video.png">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <style>
   :root {
     --bg: #f1f5f9;
@@ -37,12 +39,13 @@
   header { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; padding: 0.75rem 1.5rem; position: sticky; top: 0; z-index: 40; box-shadow: var(--shadow-md); }
   .header-inner { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
   header h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+  .titulo-icone { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; display: block; }
   header h1 small { display: block; font-size: 0.72rem; font-weight: 500; opacity: 0.85; }
   .app-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
   .app-actions button { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.12); color: #fff; }
   .app-actions button:hover:not(:disabled) { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.6); }
   .app-actions button.primary { background: #fff; color: var(--primary-dark); border-color: #fff; font-weight: 700; }
-  .app-actions button.primary:hover:not(:disabled) { background: #e0e7ff; }
+  .app-actions button.primary:hover:not(:disabled) { background: var(--primary-soft); color: var(--primary-dark); border-color: #c7d2fe; }
   .app-actions button.danger { background: var(--danger); color: #fff; border-color: rgba(255,255,255,0.25); font-weight: 600; }
   .app-actions button.danger:hover:not(:disabled) { background: var(--danger-dark); }
 
@@ -90,6 +93,31 @@
     .app-actions { width: 100%; }
     .app-actions button { flex: 1; }
   }
+
+  /* ===== Painéis expansíveis (accordion) ===== */
+  .panel.panel-expandivel > h2 { cursor: pointer; user-select: none; }
+  .panel.panel-expandivel > h2:hover { color: var(--primary); }
+  .panel.panel-expandivel > h2::after { content: "▾"; margin-left: auto; font-size: 0.85rem; color: var(--muted); transition: transform .15s; }
+  .panel.panel-expandivel.collapsed { padding-bottom: 0.75rem; }
+  .panel.panel-expandivel.collapsed > h2 { margin-bottom: 0; }
+  .panel.panel-expandivel.collapsed > h2::after { content: "▸"; }
+  .panel.panel-expandivel.collapsed > *:not(h2) { display: none !important; }
+  .panel-toggle { font-size: 0.72rem !important; font-weight: 600 !important; text-transform: none !important; letter-spacing: 0 !important; padding: 0.25rem 0.6rem !important; margin-left: 0.5rem; }
+  /* Fit das células dos cartões + dias centralizados */
+  .quadro-table th { text-align: center; }
+  .quadro-table td:first-child { text-align: center; white-space: nowrap; }
+  .quadro-table .disc, .quadro-table .prof { text-align: center; }
+  #cartoes-geral .quadro-table td.celula { padding: 0.3rem 0.45rem; min-width: 92px; min-height: 32px; font-size: 0.78rem; vertical-align: middle; }
+  #cartoes-geral .quadro-table td.intervalo { text-align: center; }
+  /* Boxes retráteis de turma (Quadro) e disciplina (Cartões) */
+  .colapsivel { border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem; background: #fff; }
+  .colapsivel > .titulo { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.95rem; font-weight: 800; }
+  .colapsivel > .titulo:hover { color: var(--primary); }
+  .colapsivel > .titulo::after { content: "▾"; margin-left: auto; font-size: 1.25rem; font-weight: 800; line-height: 1; color: var(--muted); }
+  .colapsivel.collapsed { padding-bottom: 0.75rem; }
+  .colapsivel.collapsed > .titulo { margin-bottom: 0; }
+  .colapsivel.collapsed > .titulo::after { content: "▸"; }
+  .colapsivel.collapsed > .corpo { display: none !important; }
 
   /* ===== Formulários ===== */
   .form { display: grid; gap: 0.75rem; }
@@ -176,8 +204,9 @@
 
 <header>
   <div class="header-inner">
-    <h1>🏫 Montador de Horários Escolares</h1>
+    <h1><img src="video.png" alt="" class="titulo-icone"> Montador de Horários Escolares</h1>
     <div class="app-actions">
+      <button onclick="validarTemplateXlsx()">📊 Validar template.xlsx</button>
       <button class="primary" onclick="exportarJSON()">Exportar JSON</button>
       <button onclick="importarJSON()">Importar JSON</button>
       <button class="danger" onclick="resetar()">Limpar tudo</button>
@@ -190,6 +219,8 @@
     <button class="active" onclick="mostrarAba('cadastros')">Cadastros</button>
     <button onclick="mostrarAba('geracao')">Geração</button>
     <button onclick="mostrarAba('quadro')">Quadro Geral</button>
+    <button onclick="mostrarAba('cartoes')">Cartões</button>
+    <button onclick="mostrarAba('leiame')">Leia-me</button>
     <!-- Aba Regras oculta para uso posterior (mantida no arquivo) -->
     <button class="oculto" hidden onclick="mostrarAba('regras')">Regras</button>
   </div>
@@ -212,33 +243,31 @@
     </div>
     <!-- Fim Painel Matriz Escolar -->
 
-    <div class="grid-2">
-      <!-- Painel Disciplinas (primeiro) -->
-      <div class="panel">
-        <h2>📖 Disciplinas</h2>
-        <p class="msg">Cadastre as disciplinas com seus tempos de aula diferenciados.</p>
-        <div class="linha">
-          <div><label>Disciplina</label><input type="text" id="inp-disc-nome" placeholder="Matemática"></div>
-          <div style="min-width:140px"><label>tempos/semana</label><input type="number" id="inp-disc-tempos" value="1" min="1" max="6"></div>
-        </div>
-        <button class="primary btn-block" onclick="adicionarDisciplina()">Adicionar disciplina</button>
-        <div id="lista-disciplinas" class="lista-itens"></div>
+    <!-- Painel Disciplinas -->
+    <div class="panel">
+      <h2>📖 Disciplinas</h2>
+      <p class="msg">Cadastre as disciplinas com seus tempos de aula diferenciados.</p>
+      <div class="linha">
+        <div><label>Disciplina</label><input type="text" id="inp-disc-nome" placeholder="Matemática"></div>
+        <div style="min-width:140px"><label>tempos/semana</label><input type="number" id="inp-disc-tempos" value="1" min="1" max="6"></div>
       </div>
+      <button class="primary btn-block" onclick="adicionarDisciplina()">Adicionar disciplina</button>
+      <div id="lista-disciplinas" class="lista-itens"></div>
+    </div>
 
-      <!-- Painel Carga horária -->
-      <div class="panel">
-        <h2>📚 Carga horária por série</h2>
-        <p class="msg">Defina quantas aulas/semana cada disciplina tem em cada série.</p>
-        <div class="linha">
-          <div><label>Série</label><select id="inp-carga-serie"><option value="">— selecionar —</option><option value="6º ano">6º ano</option><option value="7º ano">7º ano</option><option value="8º ano">8º ano</option><option value="9º ano">9º ano</option><option value="1ª serie">1ª serie</option><option value="2ª serie">2ª serie</option><option value="3ª serie">3ª serie</option></select></div>
-          <div><label>Disciplina</label><select id="inp-carga-disc"><option value="">— selecionar —</option></select></div>
-        </div>
-        <div class="linha">
-          <div style="min-width:140px"><label>Aulas/semana</label><input type="number" id="inp-carga-qtd" value="4" min="1"></div>
-        </div>
-        <button class="primary btn-block" onclick="adicionarCarga()">Adicionar carga</button>
-        <div id="lista-cargas" class="lista-itens"></div>
+    <!-- Painel Carga horária -->
+    <div class="panel">
+      <h2>📚 Carga horária por série</h2>
+      <p class="msg">Defina quantas aulas/semana cada disciplina tem em cada série.</p>
+      <div class="linha">
+        <div><label>Série</label><select id="inp-carga-serie"><option value="">— selecionar —</option><option value="6º ano">6º ano</option><option value="7º ano">7º ano</option><option value="8º ano">8º ano</option><option value="9º ano">9º ano</option><option value="1ª serie">1ª serie</option><option value="2ª serie">2ª serie</option><option value="3ª serie">3ª serie</option></select></div>
+        <div><label>Disciplina</label><select id="inp-carga-disc"><option value="">— selecionar —</option></select></div>
       </div>
+      <div class="linha">
+        <div style="min-width:140px"><label>Aulas/semana</label><input type="number" id="inp-carga-qtd" value="4" min="1"></div>
+      </div>
+      <button class="primary btn-block" onclick="adicionarCarga()">Adicionar carga</button>
+      <div id="lista-cargas" class="lista-itens"></div>
     </div>
 
     <!-- Painel Professores -->
@@ -325,13 +354,74 @@
       <p class="msg">Clique em uma célula de aula preenchida para remover. Intervalos não podem ser editados.</p>
       <div id="quadro-geral"></div>
     </div>
-    <div class="panel">
+    <div class="panel panel-expandivel collapsed" id="panel-conformidade">
       <h2>🧾 Cartão de Professores — Conformidade</h2>
       <p class="msg">Resumo por professor com dias/séries/tempos vagos conforme a Minuta 1337/2023 (padrão mínimo: 3 dias, ≤3 séries, ≤5 tempos vagos).</p>
       <div id="relatorio-professores"></div>
     </div>
   </section>
   <!-- FIM ABA: QUADRO -->
+
+  <!-- ABA: CARTÕES -->
+  <section id="aba-cartoes">
+    <div class="panel">
+      <h2>🪪 Cartões individuais por professor</h2>
+      <p class="msg">Cada tabela mostra onde o professor está: <b>turma</b> (ex: 601) no dia e bloco. Se não houver aula, a célula fica <b>vaga</b> (—).</p>
+      <div id="cartoes-geral"></div>
+    </div>
+  </section>
+  <!-- FIM ABA: CARTÕES -->
+
+  <!-- ABA: LEIA-ME -->
+  <section id="aba-leiame">
+    <div class="panel regras-panel">
+      <h2>📖 Leia-me — Template de cadastro (`template.xlsx`)</h2>
+      <p class="msg">Preencha o arquivo **`template.xlsx`** (6 abas, já com exemplo) no Excel/Sheets e me envie. Eu converto em `escola-horarios.json` pronto para **Importar JSON**. Não renomeie as abas nem altere a primeira linha (cabeçalho).</p>
+      <h3>Abas do template.xlsx</h3>
+      <ol>
+        <li><strong>Disciplinas</strong> — `Nome | Tempos/sem` (1–6). Ex: Matemática | 4</li>
+        <li><strong>Cargas</strong> — `Série | Disciplina | Aulas/sem`. Ex: 6º ano | Matemática | 4</li>
+        <li><strong>Professores</strong> — `Nome | Disciplina | Série | CargaMáx | Dia1/Turnos1 ... Dia6/Turnos6 | SábadoVol`. Ex: Ana Lima | Matemática | 6º ano | 20 | seg | manhã | qua | manhã ... | N</li>
+        <li><strong>Turmas</strong> — `Turma | Série | Turno`. Ex: 601 | 6º ano | Manhã</li>
+        <li><strong>Blocos</strong> — `Início | Fim | Tipo` (aula/intervalo). Opcional — se não enviar, uso o padrão 07:30–12:00.</li>
+        <li><strong>LEIA-ME</strong> — valores permitidos e regras (resumo abaixo).</li>
+      </ol>
+      <h3>Valores permitidos</h3>
+      <ol>
+        <li><strong>Série:</strong> `6º ano, 7º ano, 8º ano, 9º ano, 1ª serie, 2ª serie, 3ª serie` (exatamente assim)</li>
+        <li><strong>Turno (turma):</strong> `Manhã, Tarde, Noite`</li>
+        <li><strong>Dia (professor):</strong> `seg, ter, qua, qui, sex, sab`</li>
+        <li><strong>Turnos (professor):</strong> `manhã, tarde, noite` — pode listar mais de um com vírgula na mesma célula: `manhã,tarde` (dias e turnos atrelados: ex. segunda só manhã, terça tarde/noite)</li>
+        <li><strong>SábadoVol:</strong> `S` (sim) ou `N` (não) — obrigatório `S` para Línguas no sábado</li>
+        <li><strong>Turma:</strong> Fund. II `601–606, 701–706...` | Ens. Médio `1101, 2102, 1201...` (consulte o dropdown da Matriz)</li>
+      </ol>
+      <h3>Regras da Minuta (validação)</h3>
+      <ol>
+        <li>O **Nome** da disciplina deve ser idêntico entre as abas Disciplinas, Cargas e Professores</li>
+        <li>Professor 40h (carga ≥ 20): idealmente **mín. 3 dias** e **mín. 2 turnos** — o app avisa se estiver abaixo</li>
+        <li>**Não** são permitidos 3 dias seguidos de disponibilidade (ex: `seg, ter, qua` bloqueia)</li>
+        <li>Professor de Língua (Inglês/Espanhol/Francês) no sábado só com `SábadoVol = S`</li>
+      </ol>
+      <h3>O que eu faço depois</h3>
+      <ol>
+        <li>Leio as 6 abas do `template.xlsx`</li>
+        <li>Mostro um resumo do que será importado</li>
+        <li>Gero o `escola-horarios.json` (ou já deixo o `index2.html` carregado)</li>
+      </ol>
+      <h3>O que você faz depois</h3>
+      <ol>
+        <li><strong>Abra o `template.xlsx`</strong> no Excel ou Google Sheets e preencha as 6 abas (não renomeie as abas nem altere a primeira linha de cada aba).</li>
+        <li><strong>Salve o arquivo</strong> e <strong>envie para mim</strong> (cole o `template.xlsx` na pasta do projeto ou anexe aqui).</li>
+        <li><strong>Aguarde a validação:</strong> eu mostro o resumo (nº de disciplinas, professores, turmas e alertas da Minuta) e confirmo antes de importar.</li>
+        <li><strong>Importe no app:</strong> clique em <strong>Importar JSON</strong> (canto superior) e selecione o `escola-horarios.json` gerado. Os cadastros aparecem na aba <strong>Cadastros</strong> (expanda cada painel clicando no título).</li>
+        <li><strong>Confira os cadastros:</strong> Matriz → Disciplinas → Carga → Professores. Se algo estiver errado, edite nas listas ou me avise que eu corrijo a planilha e regenero.</li>
+        <li><strong>Gere o horário:</strong> vá na aba <strong>Geração</strong>, confirme os <strong>Blocos</strong> e os <strong>Dias da semana</strong> e clique em <strong>Gerar horários de todas as turmas</strong>.</li>
+        <li><strong>Consulte o resultado:</strong> a aba <strong>Quadro Geral</strong> abre com as grades por turma e o <strong>Cartão de Conformidade</strong> por professor. Clique em uma célula preenchida para remover uma aula.</li>
+        <li><strong>Faça backup:</strong> clique em <strong>Exportar JSON</strong> e guarde uma cópia do arquivo — sem ela, limpar o browser apaga os dados (o app salva só no navegador).</li>
+      </ol>
+    </div>
+  </section>
+  <!-- FIM ABA: LEIA-ME -->
 
   <!-- ABA: REGRAS (oculta — mantida no arquivo para uso posterior) -->
   <section id="aba-regras" class="oculto" hidden>
@@ -435,6 +525,26 @@
           diasSemana: dados.diasSemana || 5,
           grades: dados.grades && typeof dados.grades === 'object' ? dados.grades : {}
         };
+        // Migração blocos padrão antigos (5x50min, 07:30) → novo padrão 7x40min 07:00–12:00
+        if (state.blocos.length === 6 && state.blocos[0] && state.blocos[0].inicio === '07:30') {
+          state.blocos = blocosPadrao();
+          // Remapeia grades antigas para os novos ids é complexo — limpa só os horários e mantém cadastros
+          Object.values(state.grades || {}).forEach(g => { Object.keys(g).forEach(k => delete g[k]); });
+        }
+        // Migração blocos manhã-only (8, até 12h) → manhã + almoço + tarde até 18h (17)
+        if (state.blocos.length === 8 && state.blocos[0] && state.blocos[0].inicio === '07:00') {
+          state.blocos = blocosPadrao();
+          // Garante grades para os novos ids e zera só os slots de tarde (mantém manhã se possível)
+          Object.keys(state.grades || {}).forEach(tn => {
+            const g = state.grades[tn];
+            state.blocos.forEach(b => {
+              if (!g[b.id]) g[b.id] = {};
+              if (b.tipo === 'aula' && b.inicio >= '13:00') {
+                DIAS_SEMANA.slice(0, state.diasSemana || 5).forEach(d => { g[b.id][d] = null; });
+              }
+            });
+          });
+        }
         // Normaliza professores legados (dias/turnos sempre arrays + disponibilidade atrelada)
         state.professores.forEach(p => {
           if (!Array.isArray(p.dias)) p.dias = p.dias ? [p.dias] : [];
@@ -472,8 +582,30 @@
     if (btns[abaIdx[aba]]) btns[abaIdx[aba]].classList.add('active');
     render();
   }
+
+  // Painéis expansíveis (accordion): clique no h2 alterna collapsed
+  function configurarPaineisExpansiveis() {
+    $$('#aba-cadastros .panel, #aba-geracao .panel, #panel-conformidade').forEach(pan => {
+      pan.classList.add('panel-expandivel');
+      // Começa recolhido para não alongar a página (expansível por clique)
+      if (!pan.dataset.expansibleInit) {
+        pan.classList.add('collapsed');
+        pan.dataset.expansibleInit = '1';
+      }
+      const h = pan.querySelector('h2');
+      if (h && !h.dataset.accordionSet) {
+        h.dataset.accordionSet = '1';
+        h.setAttribute('title', 'Clique para expandir/recolher');
+        h.setAttribute('aria-expanded', pan.classList.contains('collapsed') ? 'false' : 'true');
+        h.onclick = () => {
+          pan.classList.toggle('collapsed');
+          h.setAttribute('aria-expanded', pan.classList.contains('collapsed') ? 'false' : 'true');
+        };
+      }
+    });
+  }
   
-  const abaIdx = { cadastros: 0, geracao: 1, quadro: 2, regras: 3 };
+  const abaIdx = { cadastros: 0, geracao: 1, quadro: 2, cartoes: 3, leiame: 4, regras: 5 };
   
   function render() {
     preencherDisciplinas();
@@ -483,10 +615,12 @@
     renderTurmas();
     renderBlocos();
     renderQuadroGeral();
+    renderCartoes();
     renderRelatorio();
     renderRegras();
     atualizarTurnosCondicional();
     renderDispTemp();
+    configurarPaineisExpansiveis();
     const selDias = $id('inp-dias-semana');
     if (selDias) selDias.value = String(state.diasSemana || 5);
   }
@@ -920,9 +1054,21 @@
   // ==================== QUADRO GERAL ====================
   const DIAS_LABEL = { seg: 'Seg', ter: 'Ter', qua: 'Qua', qui: 'Qui', sex: 'Sex', sab: 'Sáb' };
 
+  function alternarColapsivel(el) {
+    const box = el.closest('.colapsivel');
+    if (box) box.classList.toggle('collapsed');
+  }
+
   function removerCelula(turmaNome, blocoId, dia) {
     const g = state.grades && state.grades[turmaNome];
-    if (g && g[blocoId]) g[blocoId][dia] = null;
+    const cel = g && g[blocoId] ? g[blocoId][dia] : null;
+    if (!cel) return;
+    const bloco = (state.blocos || []).find(b => b.id === blocoId);
+    const blocoTxt = bloco ? `${bloco.inicio}–${bloco.fim}` : blocoId;
+    const diaTxt = DIAS_LABEL[dia] || dia;
+    const ok = confirm(`Apagar a aula?\n\nTurma ${turmaNome} — ${diaTxt} ${blocoTxt}\n${cel.disciplina} (${cel.professorNome || ''})\n\nClique em Cancelar para manter.`);
+    if (!ok) return;
+    g[blocoId][dia] = null;
     salvarEstado();
     render();
   }
@@ -940,11 +1086,20 @@
     }
     garantirGrades();
     const dias = DIAS_SEMANA.slice(0, state.diasSemana || 5);
+    function mostrarBlocoParaTurma(bloco, turnoTurmaNorm) {
+      const h = parseInt(String(bloco.inicio).split(':')[0], 10);
+      if (!turnoTurmaNorm) return true;
+      if (turnoTurmaNorm === 'manha') return h < 12;
+      if (turnoTurmaNorm === 'tarde' || turnoTurmaNorm === 'noite') return h >= 13;
+      return true;
+    }
     let html = '';
     (state.turmas || []).forEach(t => {
-      html += `<h3 class="quadro-titulo">Turma ${escapeHtml(t.nome)} <span>— ${escapeHtml(t.serie)} · ${escapeHtml(t.turno)}</span></h3>`;
-      html += '<div class="quadro-wrap"><table class="quadro-table"><thead><tr><th>Bloco</th>' + dias.map(d => `<th>${DIAS_LABEL[d]}</th>`).join('') + '</tr></thead><tbody>';
-      (state.blocos || []).forEach(b => {
+      const turnoTurmaNorm = t.turno ? normalizarTexto(t.turno) : '';
+      const blocosVisiveis = (state.blocos || []).filter(b => mostrarBlocoParaTurma(b, turnoTurmaNorm));
+      html += `<div class="colapsivel collapsed"><h3 class="titulo" onclick="alternarColapsivel(this)" title="Clique para expandir/recolher">Turma ${escapeHtml(t.nome)} <span style="color:var(--muted);font-weight:500;font-size:0.82rem;">— ${escapeHtml(t.serie)} · ${escapeHtml(t.turno)}</span></h3><div class="corpo">`;
+      html += '<div class="quadro-wrap" style="margin-bottom:0;"><table class="quadro-table"><thead><tr><th>Bloco</th>' + dias.map(d => `<th>${DIAS_LABEL[d]}</th>`).join('') + '</tr></thead><tbody>';
+      blocosVisiveis.forEach(b => {
         if (b.tipo === 'intervalo') {
           html += `<tr><td><strong>${escapeHtml(b.inicio)}–${escapeHtml(b.fim)}</strong></td>` + dias.map(() => '<td class="intervalo">Intervalo</td>').join('') + '</tr>';
           return;
@@ -960,9 +1115,87 @@
         });
         html += '</tr>';
       });
-      html += '</tbody></table></div>';
+      html += '</tbody></table></div></div></div>';
     });
     el.innerHTML = html;
+  }
+
+  // ==================== CARTÕES INDIVIDUAIS POR PROFESSOR ====================
+  // Agrupado por disciplina (todas as criadas no cadastro, cada uma em box retrátil)
+  function renderCartoes() {
+    const el = $id('cartoes-geral');
+    if (!el) return;
+    if (!state.professores || state.professores.length === 0) {
+      el.innerHTML = '<p class="msg">Nenhum professor cadastrado.</p>';
+      return;
+    }
+    if (!state.blocos || state.blocos.length === 0) {
+      el.innerHTML = '<p class="msg">Nenhum bloco cadastrado.</p>';
+      return;
+    }
+    garantirGrades();
+    const dias = DIAS_SEMANA.slice(0, state.diasSemana || 5);
+    // Mapa: professorId -> blocoId -> dia -> turmaNome
+    const mapa = {};
+    Object.keys(state.grades || {}).forEach(turmaNome => {
+      const g = state.grades[turmaNome];
+      (state.blocos || []).forEach(b => {
+        if (b.tipo !== 'aula') return;
+        dias.forEach(d => {
+          const cel = g && g[b.id] ? g[b.id][d] : null;
+          if (!cel || !cel.professorId) return;
+          if (!mapa[cel.professorId]) mapa[cel.professorId] = {};
+          if (!mapa[cel.professorId][b.id]) mapa[cel.professorId][b.id] = {};
+          mapa[cel.professorId][b.id][d] = turmaNome;
+        });
+      });
+    });
+    // Ordem das disciplinas: as cadastradas primeiro, depois as que só aparecem nos professores
+    const ordem = [...(state.disciplinas || []).map(d => d.nome)];
+    (state.professores || []).forEach(p => { if (!ordem.includes(p.disciplina)) ordem.push(p.disciplina); });
+    ordem.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    const ICONS = { artes: '🎨', 'educacao fisica': '🏃', matematica: '🔢', portugues: '📖', ingles: '🌐', ciencias: '🔬', historia: '📜', geografia: '🌍' };
+    let html = '';
+    ordem.forEach(disc => {
+      const profs = (state.professores || []).filter(p => p.disciplina === disc);
+      if (profs.length === 0) return;
+      const ic = ICONS[normalizarTexto(disc)] || '📚';
+      html += `<div class="colapsivel collapsed"><h3 class="titulo" onclick="alternarColapsivel(this)" title="Clique para expandir/recolher">${ic} ${escapeHtml(disc)} <span style="color:var(--muted);font-weight:500;font-size:0.82rem;">— ${profs.length} professor(es)</span></h3><div class="corpo">`;
+      profs.forEach(p => {
+        const m = mapa[p.id] || {};
+        html += `<h4 class="quadro-titulo" style="font-size:0.85rem;">${escapeHtml(p.nome)} <span>— ${escapeHtml((p.series || []).join(', '))}</span></h4>`;
+        function renderQuadroCartao(blocosTurno, tituloTurno) {
+          const temAula = blocosTurno.some(b => b.tipo === 'aula' && m[b.id] && Object.keys(m[b.id]).some(d => m[b.id][d]));
+          if (!temAula) return '';
+          let h = `<h5 style="margin:0.5rem 0 0.25rem;font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">${tituloTurno}</h5>`;
+          h += '<div class="quadro-wrap"><table class="quadro-table"><thead><tr><th>Bloco</th>' + dias.map(d => `<th>${DIAS_LABEL[d]}</th>`).join('') + '</tr></thead><tbody>';
+          blocosTurno.forEach(b => {
+            if (b.tipo === 'intervalo') {
+              h += `<tr><td><strong>${escapeHtml(b.inicio)}–${escapeHtml(b.fim)}</strong></td>` + dias.map(() => '<td class="intervalo">Intervalo</td>').join('') + '</tr>';
+              return;
+            }
+            h += `<tr><td><strong>${escapeHtml(b.inicio)}–${escapeHtml(b.fim)}</strong></td>`;
+            dias.forEach(d => {
+              const turmaNome = m[b.id] ? m[b.id][d] : null;
+              if (turmaNome) {
+                h += `<td class="celula celula-preenchida"><span class="disc">Turma ${escapeHtml(turmaNome)}</span><span class="prof">${escapeHtml(p.disciplina)}</span></td>`;
+              } else {
+                h += `<td class="celula"><span class="quadro-vazio">—</span></td>`;
+              }
+            });
+            h += '</tr>';
+          });
+          h += '</tbody></table></div>';
+          return h;
+        }
+        const blocosManha = (state.blocos || []).filter(b => (b.tipo === 'aula' ? turnoDoBloco(b) === 'manha' : parseInt(String(b.inicio).split(':')[0], 10) < 12));
+        const blocosTarde = (state.blocos || []).filter(b => (b.tipo === 'aula' ? turnoDoBloco(b) === 'tarde' : parseInt(String(b.inicio).split(':')[0], 10) >= 13));
+        html += renderQuadroCartao(blocosManha, '☀️ Manhã');
+        html += renderQuadroCartao(blocosTarde, '🌇 Tarde');
+      });
+      html += '</div></div>';
+    });
+    el.innerHTML = html || '<p class="msg">Nenhum professor cadastrado.</p>';
   }
 
   // ==================== RELATÓRIO DE CONFORMIDADE (MINUTA 1337/2023) ====================
@@ -1012,7 +1245,8 @@
       });
     });
 
-    let html = '<div class="quadro-wrap"><table class="quadro-table"><thead><tr><th>Professor</th><th>Disciplina</th><th>Aulas</th><th>Dias usados</th><th>Séries</th><th>Vagos</th><th>Cartão</th></tr></thead><tbody>';
+    // Conforme o conceito dos quadros: um box retrátil por professor (inicia fechado)
+    let html = '<div class="quadro-wrap" style="margin-bottom:0;"><table class="quadro-table"><thead><tr><th>Professor</th><th>Disciplina</th><th>Aulas</th><th>Dias usados</th><th>Séries</th><th>Vagos</th><th>Cartão</th></tr></thead><tbody>';
     state.professores.forEach(p => {
       const m = met[p.id] || { aulas: 0, dias: new Set(), series: new Set(), vagas: 0 };
       let badge, label;
@@ -1138,8 +1372,12 @@
       if (profs.length === 0) continue;
       
       const slots = [];
+      const turnoTurmaNorm = turmaObj && turmaObj.turno ? normalizarTexto(turmaObj.turno) : '';
       dias.forEach(d => {
         blocosAula.forEach(b => {
+          // Manhã só até 12h, Tarde a partir das 13h (almoço 12–13h sem aula)
+          const blocoTurno = turnoDoBloco(b);
+          if (blocoTurno && turnoTurmaNorm && blocoTurno !== turnoTurmaNorm) return;
           if (state.grades[ta.turma] && state.grades[ta.turma][b.id] && state.grades[ta.turma][b.id][d] === null) {
             slots.push({ dia: d, bloco: b.id });
           }
@@ -1296,14 +1534,114 @@
     return true;
   }
   
+  // ==================== VALIDAR template.xlsx ====================
+  function validarTemplateXlsx() {
+    if (typeof XLSX === 'undefined') {
+      alert('Biblioteca XLSX não carregou (é preciso internet para baixar o SheetJS). Verifique a conexão com a internet ou use o Importar JSON.');
+      return;
+    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    input.onchange = e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const fr = new FileReader();
+      fr.onload = ev => {
+        try {
+          const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+          const ler = (nome) => {
+            const ws = wb.Sheets[nome];
+            return ws ? XLSX.utils.sheet_to_json(ws, { defval: '' }) : [];
+          };
+          const norm = s => String(s || '').trim();
+          const normTurno = s => String(s || '').toLowerCase().replace(/ã/g,'a').replace(/á/g,'a').replace(/ç/g,'c').trim();
+          const discRows = ler('Disciplinas'), cargaRows = ler('Cargas'), profRows = ler('Professores'), turmaRows = ler('Turmas'), blocoRows = ler('Blocos');
+          const erros = [], avisos = [];
+          const disciplinas = discRows.filter(r => norm(r['Nome'])).map(r => ({ id: 'd' + Date.now() + Math.floor(Math.random()*1e6), nome: norm(r['Nome']), tempos: Math.min(6, Math.max(1, +r['Tempos/sem'] || 1)) }));
+          const nomesDisc = new Set(disciplinas.map(d => normalizarTexto(d.nome)));
+          const cargas = cargaRows.filter(r => norm(r['Série']) && norm(r['Disciplina'])).map(r => ({ serie: norm(r['Série']), disciplina: norm(r['Disciplina']), qtd: +r['Aulas/sem'] || 0 }));
+          cargas.forEach(c => { if (!nomesDisc.has(normalizarTexto(c.disciplina))) erros.push(`Carga "${c.disciplina}" sem disciplina cadastrada.`); });
+          const turmas = turmaRows.filter(r => norm(r['Turma'])).map(r => ({ nome: String(norm(r['Turma'])), serie: norm(r['Série']), turno: norm(r['Turno']) || 'Manhã' }));
+          const professores = [];
+          profRows.forEach((r, i) => {
+            const nome = norm(r['Nome']); if (!nome) return;
+            const capacidade = [];
+            for (let n = 1; n <= 6; n++) {
+              const dia = norm(r['Dia' + n]); const turnosRaw = norm(r['Turnos' + n]);
+              if (dia && turnosRaw) {
+                const turnos = turnosRaw.split(',').map(s => normTurno(s)).filter(Boolean);
+                capacidade.push({ dia, turnos });
+              }
+            }
+            const serie = norm(r['Série']);
+            professores.push({
+              id: 'p' + Date.now() + '_' + i,
+              nome, disciplina: norm(r['Disciplina']), series: serie ? [serie] : [],
+              cargaMaxima: +r['CargaMáx'] || 0,
+              dias: capacidade.map(x => x.dia), turnos: [...new Set(capacidade.flatMap(x => x.turnos))],
+              disponibilidade: capacidade, voluntariaSabado: norm(r['SábadoVol']).toUpperCase() === 'S'
+            });
+          });
+          professores.forEach(p => {
+            if (!nomesDisc.has(normalizarTexto(p.disciplina))) erros.push(`Professor "${p.nome}" com disciplina "${p.disciplina}" não cadastrada.`);
+            if (!p.disponibilidade.length) avisos.push(`Professor "${p.nome}" sem disponibilidade (Dia/Turnos).`);
+            if (temDiasCongecutivos(p.dias)) erros.push(`Professor "${p.nome}" com 3 dias seguidos.`);
+            if (p.cargaMaxima >= 20 && p.dias.length < 3) avisos.push(`Professor "${p.nome}" (40h) com menos de 3 dias.`);
+          });
+          const blocos = blocoRows.filter(r => norm(r['Início'])).map(r => ({ id: 'b' + Date.now() + Math.floor(Math.random()*1e6), inicio: norm(r['Início']), fim: norm(r['Fim']), tipo: norm(r['Tipo']).toLowerCase() === 'intervalo' ? 'intervalo' : 'aula' }));
+          const resumo = `RESUMO\n• Disciplinas: ${disciplinas.length}\n• Cargas: ${cargas.length}\n• Professores: ${professores.length}\n• Turmas: ${turmas.length}\n• Blocos: ${blocos.length || 'padrão'}` + (avisos.length ? `\n\nAVISOS:\n${avisos.slice(0, 8).join('\n')}` : '');
+          if (erros.length) {
+            alert(resumo + `\n\n⚠️ ERROS — corrija a planilha e tente de novo:\n${erros.slice(0, 8).join('\n')}`);
+            return;
+          }
+          const ok = confirm(resumo + `\n\nClique em OK para aplicar e abrir a geração. Clique em Cancelar para abortar.`);
+          if (!ok) return;
+          state.disciplinas = disciplinas; state.cargas = cargas; state.professores = professores; state.turmas = turmas;
+          if (blocos.length) state.blocos = blocos;
+          state.versao = 5; state.diasSemana = state.diasSemana || 5;
+          garantirGrades(); salvarEstado(); render();
+          mostrarStatus('Template aplicado com sucesso.');
+          mostrarAba('cadastros');
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao ler o template.xlsx: ' + err.message);
+        }
+      };
+      fr.readAsArrayBuffer(f);
+    };
+    input.click();
+  }
+
   // ==================== EXPORTAR / IMPORTAR ====================
-  function exportarJSON() {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  async function exportarJSON() {
+    const texto = JSON.stringify(state, null, 2);
+    // Tenta salvar direto na pasta do projeto (Chrome/Edge) via File System Access API
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: 'escola-horarios.json',
+          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(texto);
+        await writable.close();
+        mostrarStatus('Exportado: ' + (handle.name || 'escola-horarios.json'));
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return; // usuário cancelou
+        // cai para o download normal abaixo
+      }
+    }
+    // Fallback: download normal (pasta Downloads do browser)
+    const blob = new Blob([texto], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'escola-horarios.json';
+    document.body.appendChild(a);
     a.click();
+    a.remove();
     URL.revokeObjectURL(url);
     mostrarStatus('Exportado: escola-horarios.json');
   }
@@ -1378,13 +1716,33 @@
   
   function blocosPadrao() {
     return [
-      { id: 'b1', inicio: '07:30', fim: '08:20', tipo: 'aula' },
-      { id: 'b2', inicio: '08:20', fim: '09:10', tipo: 'aula' },
-      { id: 'b3', inicio: '09:10', fim: '10:00', tipo: 'aula' },
-      { id: 'b4', inicio: '10:00', fim: '10:20', tipo: 'intervalo' },
-      { id: 'b5', inicio: '10:20', fim: '11:10', tipo: 'aula' },
-      { id: 'b6', inicio: '11:10', fim: '12:00', tipo: 'aula' }
+      { id: 'b1', inicio: '07:00', fim: '07:40', tipo: 'aula' },
+      { id: 'b2', inicio: '07:40', fim: '08:20', tipo: 'aula' },
+      { id: 'b3', inicio: '08:20', fim: '09:00', tipo: 'aula' },
+      { id: 'b4', inicio: '09:00', fim: '09:40', tipo: 'aula' },
+      { id: 'b5', inicio: '09:40', fim: '10:00', tipo: 'intervalo' },
+      { id: 'b6', inicio: '10:00', fim: '10:40', tipo: 'aula' },
+      { id: 'b7', inicio: '10:40', fim: '11:20', tipo: 'aula' },
+      { id: 'b8', inicio: '11:20', fim: '12:00', tipo: 'aula' },
+      { id: 'b9', inicio: '12:00', fim: '13:00', tipo: 'intervalo' },
+      { id: 'b10', inicio: '13:00', fim: '13:40', tipo: 'aula' },
+      { id: 'b11', inicio: '13:40', fim: '14:20', tipo: 'aula' },
+      { id: 'b12', inicio: '14:20', fim: '15:00', tipo: 'aula' },
+      { id: 'b13', inicio: '15:00', fim: '15:40', tipo: 'aula' },
+      { id: 'b14', inicio: '15:40', fim: '16:00', tipo: 'intervalo' },
+      { id: 'b15', inicio: '16:00', fim: '16:40', tipo: 'aula' },
+      { id: 'b16', inicio: '16:40', fim: '17:20', tipo: 'aula' },
+      { id: 'b17', inicio: '17:20', fim: '18:00', tipo: 'aula' }
     ];
+  }
+
+  // Turno pelo horário de início: manhã <12h | tarde >=13h | almoço/intervalo = null
+  function turnoDoBloco(bloco) {
+    if (!bloco || bloco.tipo !== 'aula') return null;
+    const h = parseInt(String(bloco.inicio).split(':')[0], 10);
+    if (h < 12) return 'manha';
+    if (h >= 13) return 'tarde';
+    return null;
   }
   
   function novoHorarioVazio() {
