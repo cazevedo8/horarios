@@ -1,0 +1,999 @@
+{
+  "versao": 5,
+  "disciplinas": [
+    {
+      "id": "d1793922973449481350",
+      "nome": "Matemática",
+      "tempos": 4
+    },
+    {
+      "id": "d1793922973449847787",
+      "nome": "Português",
+      "tempos": 4
+    },
+    {
+      "id": "d1793922973449991611",
+      "nome": "Inglês",
+      "tempos": 2
+    },
+    {
+      "id": "d1793922973449274661",
+      "nome": "Ciências",
+      "tempos": 3
+    },
+    {
+      "id": "d1793922973449290024",
+      "nome": "História",
+      "tempos": 3
+    },
+    {
+      "id": "d1793922973449692816",
+      "nome": "Geografia",
+      "tempos": 3
+    },
+    {
+      "id": "d1793922973449417049",
+      "nome": "Artes",
+      "tempos": 2
+    },
+    {
+      "id": "d1793922973449172434",
+      "nome": "Educação Física",
+      "tempos": 2
+    }
+  ],
+  "cargas": [
+    {
+      "serie": "6º ano",
+      "disciplina": "Matemática",
+      "qtd": 4
+    },
+    {
+      "serie": "6º ano",
+      "disciplina": "Português",
+      "qtd": 4
+    },
+    {
+      "serie": "6º ano",
+      "disciplina": "Inglês",
+      "qtd": 2
+    },
+    {
+      "serie": "6º ano",
+      "disciplina": "Ciências",
+      "qtd": 3
+    },
+    {
+      "serie": "6º ano",
+      "disciplina": "História",
+      "qtd": 3
+    },
+    {
+      "serie": "6º ano",
+      "disciplina": "Geografia",
+      "qtd": 3
+    },
+    {
+      "serie": "6º ano",
+      "disciplina": "Artes",
+      "qtd": 2
+    },
+    {
+      "serie": "6º ano",
+      "disciplina": "Educação Física",
+      "qtd": 2
+    },
+    {
+      "serie": "7º ano",
+      "disciplina": "Matemática",
+      "qtd": 4
+    },
+    {
+      "serie": "7º ano",
+      "disciplina": "Português",
+      "qtd": 4
+    },
+    {
+      "serie": "7º ano",
+      "disciplina": "Inglês",
+      "qtd": 2
+    },
+    {
+      "serie": "7º ano",
+      "disciplina": "Ciências",
+      "qtd": 3
+    },
+    {
+      "serie": "7º ano",
+      "disciplina": "História",
+      "qtd": 2
+    },
+    {
+      "serie": "7º ano",
+      "disciplina": "Geografia",
+      "qtd": 2
+    },
+    {
+      "serie": "7º ano",
+      "disciplina": "Artes",
+      "qtd": 2
+    },
+    {
+      "serie": "7º ano",
+      "disciplina": "Educação Física",
+      "qtd": 2
+    }
+  ],
+  "professores": [
+    {
+      "id": "p1793922973449_0",
+      "nome": "Ana Lima",
+      "disciplina": "Matemática",
+      "series": [
+        "6º ano"
+      ],
+      "cargaMaxima": 20,
+      "dias": [
+        "seg",
+        "qua",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qua",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_1",
+      "nome": "Bruno Costa",
+      "disciplina": "Matemática",
+      "series": [
+        "7º ano"
+      ],
+      "cargaMaxima": 20,
+      "dias": [
+        "seg",
+        "qui",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qui",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_2",
+      "nome": "Carla Dias",
+      "disciplina": "Português",
+      "series": [
+        "6º ano"
+      ],
+      "cargaMaxima": 20,
+      "dias": [
+        "ter",
+        "qua",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "ter",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qua",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_3",
+      "nome": "Diego Melo",
+      "disciplina": "Português",
+      "series": [
+        "7º ano"
+      ],
+      "cargaMaxima": 20,
+      "dias": [
+        "seg",
+        "ter",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "ter",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_4",
+      "nome": "Elena Rios",
+      "disciplina": "Inglês",
+      "series": [
+        "6º ano"
+      ],
+      "cargaMaxima": 10,
+      "dias": [
+        "ter",
+        "qui"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "ter",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qui",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_5",
+      "nome": "Fábio Nunes",
+      "disciplina": "Inglês",
+      "series": [
+        "7º ano"
+      ],
+      "cargaMaxima": 10,
+      "dias": [
+        "seg",
+        "qua"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qua",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_6",
+      "nome": "Gabi Pinto",
+      "disciplina": "Ciências",
+      "series": [
+        "6º ano"
+      ],
+      "cargaMaxima": 18,
+      "dias": [
+        "seg",
+        "ter",
+        "qui"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "ter",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qui",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_7",
+      "nome": "Heitor Sá",
+      "disciplina": "Ciências",
+      "series": [
+        "7º ano"
+      ],
+      "cargaMaxima": 18,
+      "dias": [
+        "qua",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "qua",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_8",
+      "nome": "Igor Valle",
+      "disciplina": "História",
+      "series": [
+        "6º ano"
+      ],
+      "cargaMaxima": 12,
+      "dias": [
+        "ter",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "ter",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_9",
+      "nome": "Júlia Reis",
+      "disciplina": "História",
+      "series": [
+        "7º ano"
+      ],
+      "cargaMaxima": 12,
+      "dias": [
+        "seg",
+        "qua"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qua",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_10",
+      "nome": "Kaique Luz",
+      "disciplina": "Geografia",
+      "series": [
+        "6º ano"
+      ],
+      "cargaMaxima": 12,
+      "dias": [
+        "seg",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_11",
+      "nome": "Lara Moura",
+      "disciplina": "Geografia",
+      "series": [
+        "7º ano"
+      ],
+      "cargaMaxima": 12,
+      "dias": [
+        "ter",
+        "qui"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "ter",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qui",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_12",
+      "nome": "Marcos Filipe",
+      "disciplina": "Artes",
+      "series": [
+        "6º ano"
+      ],
+      "cargaMaxima": 10,
+      "dias": [
+        "qua",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "qua",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_13",
+      "nome": "Nina Duarte",
+      "disciplina": "Artes",
+      "series": [
+        "7º ano"
+      ],
+      "cargaMaxima": 10,
+      "dias": [
+        "ter",
+        "seg"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "ter",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_14",
+      "nome": "Otávio Cruz",
+      "disciplina": "Educação Física",
+      "series": [
+        "6º ano"
+      ],
+      "cargaMaxima": 20,
+      "dias": [
+        "seg",
+        "ter",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "ter",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    },
+    {
+      "id": "p1793922973449_15",
+      "nome": "Paula Mendes",
+      "disciplina": "Educação Física",
+      "series": [
+        "7º ano"
+      ],
+      "cargaMaxima": 20,
+      "dias": [
+        "seg",
+        "qua",
+        "sex"
+      ],
+      "turnos": [
+        "manha"
+      ],
+      "disponibilidade": [
+        {
+          "dia": "seg",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "qua",
+          "turnos": [
+            "manha"
+          ]
+        },
+        {
+          "dia": "sex",
+          "turnos": [
+            "manha"
+          ]
+        }
+      ],
+      "voluntariaSabado": false
+    }
+  ],
+  "turmas": [
+    {
+      "nome": "601",
+      "serie": "6º ano",
+      "turno": "Manhã"
+    },
+    {
+      "nome": "701",
+      "serie": "7º ano",
+      "turno": "Manhã"
+    }
+  ],
+  "blocos": [
+    {
+      "id": "b17939229734492755",
+      "inicio": "07:30",
+      "fim": "08:20",
+      "tipo": "aula"
+    },
+    {
+      "id": "b1793922973449789432",
+      "inicio": "08:20",
+      "fim": "09:10",
+      "tipo": "aula"
+    },
+    {
+      "id": "b1793922973449147108",
+      "inicio": "09:10",
+      "fim": "10:00",
+      "tipo": "aula"
+    },
+    {
+      "id": "b1793922973449882166",
+      "inicio": "10:00",
+      "fim": "10:20",
+      "tipo": "intervalo"
+    },
+    {
+      "id": "b179392297344993013",
+      "inicio": "10:20",
+      "fim": "11:10",
+      "tipo": "aula"
+    },
+    {
+      "id": "b1793922973449841437",
+      "inicio": "11:10",
+      "fim": "12:00",
+      "tipo": "aula"
+    }
+  ],
+  "diasSemana": 5,
+  "grades": {
+    "601": {
+      "b17939229734492755": {
+        "seg": {
+          "disciplina": "Matemática",
+          "professorId": "p1793922973449_0",
+          "professorNome": "Ana Lima"
+        },
+        "ter": {
+          "disciplina": "Português",
+          "professorId": "p1793922973449_2",
+          "professorNome": "Carla Dias"
+        },
+        "qua": {
+          "disciplina": "Matemática",
+          "professorId": "p1793922973449_0",
+          "professorNome": "Ana Lima"
+        },
+        "qui": {
+          "disciplina": "Inglês",
+          "professorId": "p1793922973449_4",
+          "professorNome": "Elena Rios"
+        },
+        "sex": {
+          "disciplina": "Matemática",
+          "professorId": "p1793922973449_0",
+          "professorNome": "Ana Lima"
+        },
+        "sab": null
+      },
+      "b1793922973449789432": {
+        "seg": {
+          "disciplina": "Matemática",
+          "professorId": "p1793922973449_0",
+          "professorNome": "Ana Lima"
+        },
+        "ter": {
+          "disciplina": "Inglês",
+          "professorId": "p1793922973449_4",
+          "professorNome": "Elena Rios"
+        },
+        "qua": {
+          "disciplina": "Português",
+          "professorId": "p1793922973449_2",
+          "professorNome": "Carla Dias"
+        },
+        "qui": {
+          "disciplina": "Ciências",
+          "professorId": "p1793922973449_6",
+          "professorNome": "Gabi Pinto"
+        },
+        "sex": {
+          "disciplina": "Português",
+          "professorId": "p1793922973449_2",
+          "professorNome": "Carla Dias"
+        },
+        "sab": null
+      },
+      "b1793922973449147108": {
+        "seg": {
+          "disciplina": "Geografia",
+          "professorId": "p1793922973449_10",
+          "professorNome": "Kaique Luz"
+        },
+        "ter": {
+          "disciplina": "Ciências",
+          "professorId": "p1793922973449_6",
+          "professorNome": "Gabi Pinto"
+        },
+        "qua": {
+          "disciplina": "Português",
+          "professorId": "p1793922973449_2",
+          "professorNome": "Carla Dias"
+        },
+        "qui": null,
+        "sex": {
+          "disciplina": "História",
+          "professorId": "p1793922973449_8",
+          "professorNome": "Igor Valle"
+        },
+        "sab": null
+      },
+      "b1793922973449882166": {
+        "seg": null,
+        "ter": null,
+        "qua": null,
+        "qui": null,
+        "sex": null,
+        "sab": null
+      },
+      "b179392297344993013": {
+        "seg": {
+          "disciplina": "Ciências",
+          "professorId": "p1793922973449_6",
+          "professorNome": "Gabi Pinto"
+        },
+        "ter": {
+          "disciplina": "História",
+          "professorId": "p1793922973449_8",
+          "professorNome": "Igor Valle"
+        },
+        "qua": {
+          "disciplina": "Artes",
+          "professorId": "p1793922973449_12",
+          "professorNome": "Marcos Filipe"
+        },
+        "qui": null,
+        "sex": {
+          "disciplina": "Geografia",
+          "professorId": "p1793922973449_10",
+          "professorNome": "Kaique Luz"
+        },
+        "sab": null
+      },
+      "b1793922973449841437": {
+        "seg": {
+          "disciplina": "Educação Física",
+          "professorId": "p1793922973449_14",
+          "professorNome": "Otávio Cruz"
+        },
+        "ter": {
+          "disciplina": "História",
+          "professorId": "p1793922973449_8",
+          "professorNome": "Igor Valle"
+        },
+        "qua": {
+          "disciplina": "Artes",
+          "professorId": "p1793922973449_12",
+          "professorNome": "Marcos Filipe"
+        },
+        "qui": null,
+        "sex": {
+          "disciplina": "Geografia",
+          "professorId": "p1793922973449_10",
+          "professorNome": "Kaique Luz"
+        },
+        "sab": null
+      }
+    },
+    "701": {
+      "b17939229734492755": {
+        "seg": {
+          "disciplina": "Matemática",
+          "professorId": "p1793922973449_1",
+          "professorNome": "Bruno Costa"
+        },
+        "ter": {
+          "disciplina": "Português",
+          "professorId": "p1793922973449_3",
+          "professorNome": "Diego Melo"
+        },
+        "qua": {
+          "disciplina": "Ciências",
+          "professorId": "p1793922973449_7",
+          "professorNome": "Heitor Sá"
+        },
+        "qui": {
+          "disciplina": "Matemática",
+          "professorId": "p1793922973449_1",
+          "professorNome": "Bruno Costa"
+        },
+        "sex": {
+          "disciplina": "Matemática",
+          "professorId": "p1793922973449_1",
+          "professorNome": "Bruno Costa"
+        },
+        "sab": null
+      },
+      "b1793922973449789432": {
+        "seg": {
+          "disciplina": "Português",
+          "professorId": "p1793922973449_3",
+          "professorNome": "Diego Melo"
+        },
+        "ter": {
+          "disciplina": "Geografia",
+          "professorId": "p1793922973449_11",
+          "professorNome": "Lara Moura"
+        },
+        "qua": {
+          "disciplina": "Inglês",
+          "professorId": "p1793922973449_5",
+          "professorNome": "Fábio Nunes"
+        },
+        "qui": {
+          "disciplina": "Geografia",
+          "professorId": "p1793922973449_11",
+          "professorNome": "Lara Moura"
+        },
+        "sex": {
+          "disciplina": "Matemática",
+          "professorId": "p1793922973449_1",
+          "professorNome": "Bruno Costa"
+        },
+        "sab": null
+      },
+      "b1793922973449147108": {
+        "seg": {
+          "disciplina": "Português",
+          "professorId": "p1793922973449_3",
+          "professorNome": "Diego Melo"
+        },
+        "ter": {
+          "disciplina": "Artes",
+          "professorId": "p1793922973449_13",
+          "professorNome": "Nina Duarte"
+        },
+        "qua": {
+          "disciplina": "História",
+          "professorId": "p1793922973449_9",
+          "professorNome": "Júlia Reis"
+        },
+        "qui": null,
+        "sex": {
+          "disciplina": "Português",
+          "professorId": "p1793922973449_3",
+          "professorNome": "Diego Melo"
+        },
+        "sab": null
+      },
+      "b1793922973449882166": {
+        "seg": null,
+        "ter": null,
+        "qua": null,
+        "qui": null,
+        "sex": null,
+        "sab": null
+      },
+      "b179392297344993013": {
+        "seg": {
+          "disciplina": "História",
+          "professorId": "p1793922973449_9",
+          "professorNome": "Júlia Reis"
+        },
+        "ter": {
+          "disciplina": "Artes",
+          "professorId": "p1793922973449_13",
+          "professorNome": "Nina Duarte"
+        },
+        "qua": {
+          "disciplina": "Educação Física",
+          "professorId": "p1793922973449_15",
+          "professorNome": "Paula Mendes"
+        },
+        "qui": null,
+        "sex": {
+          "disciplina": "Ciências",
+          "professorId": "p1793922973449_7",
+          "professorNome": "Heitor Sá"
+        },
+        "sab": null
+      },
+      "b1793922973449841437": {
+        "seg": {
+          "disciplina": "Inglês",
+          "professorId": "p1793922973449_5",
+          "professorNome": "Fábio Nunes"
+        },
+        "ter": null,
+        "qua": {
+          "disciplina": "Educação Física",
+          "professorId": "p1793922973449_15",
+          "professorNome": "Paula Mendes"
+        },
+        "qui": null,
+        "sex": {
+          "disciplina": "Ciências",
+          "professorId": "p1793922973449_7",
+          "professorNome": "Heitor Sá"
+        },
+        "sab": null
+      }
+    }
+  }
+}
